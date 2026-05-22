@@ -38,7 +38,7 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:3000/user/createuser", {
+      await axios.post("https://koode-23xz.onrender.com/user/createuser", {
         username: formData.username,
         email: formData.email,
         password: formData.password,

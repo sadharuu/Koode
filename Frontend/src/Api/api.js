@@ -1,6 +1,6 @@
 import axios from "axios"
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "https://koode-23xz.onrender.com";
 
 // Important: send and receive cookies automatically
 axios.defaults.withCredentials = true;

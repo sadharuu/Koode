@@ -8,7 +8,7 @@ export const SocketProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:3000", {
+    const newSocket = io("https://koode-23xz.onrender.com", {
       withCredentials: true,
     });
 

@@ -70,7 +70,7 @@ const ChatPage = () => {
     const fetchUsers = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:3000/user/showuser",
+          "https://koode-23xz.onrender.com/user/showuser",
           {
             withCredentials: true,
           }
@@ -106,7 +106,7 @@ const ChatPage = () => {
     const fetchMessages = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3000/message/showmessage/${currentUser._id}/${selectedUser._id}`,
+          `https://koode-23xz.onrender.com/message/showmessage/${currentUser._id}/${selectedUser._id}`,
           {
             withCredentials: true,
           }
@@ -193,7 +193,7 @@ const ChatPage = () => {
     try {
     // 1. Save message to MongoDB
       const res = await axios.post(
-        "http://localhost:3000/message/sendmessage",
+        "https://koode-23xz.onrender.com/message/sendmessage",
         {
           senderId: currentUser._id,
           receiverId: selectedUser._id,
@@ -231,7 +231,7 @@ const ChatPage = () => {
   const handleLogout = async () => {
     try {
       await axios.post(
-        "http://localhost:3000/user/logout",
+        "https://koode-23xz.onrender.com/user/logout",
         {},
         {
           withCredentials: true,
