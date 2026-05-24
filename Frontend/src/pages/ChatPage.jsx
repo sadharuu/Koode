@@ -3,38 +3,41 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useSocket } from "../context/SocketContext";
 
-// Layout Components
+// Components
 import Sidebar from "../components/layout/Sidebar";
 import UserPanel from "../components/layout/UserPanel";
 import ChatHeader from "../components/layout/ChatHeader";
 
-// Chat Components
 import MessageList from "../components/chat/MessageList";
 import MessageInput from "../components/chat/MessageInput";
 
 const ChatPage = () => {
   const navigate = useNavigate();
+
   const { socket, onlineUsers = [] } = useSocket();
 
   // ==============================
-  // State
+  // STATE
   // ==============================
   const [currentUser, setCurrentUser] = useState(null);
 
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+
   const [search, setSearch] = useState("");
+
   const [showUserPanel, setShowUserPanel] = useState(false);
 
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+
   const [message, setMessage] = useState("");
+
   const [messages, setMessages] = useState([]);
 
   const messagesEndRef = useRef(null);
 
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
-
   // ==============================
-  // Load current user from localStorage
+  // LOAD USER
   // ==============================
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -46,16 +49,19 @@ const ChatPage = () => {
 
     try {
       const parsedUser = JSON.parse(storedUser);
+
       setCurrentUser(parsedUser);
     } catch (error) {
       console.error("Invalid user data:", error);
+
       localStorage.removeItem("user");
+
       navigate("/");
     }
   }, [navigate]);
 
   // ==============================
-  // Register current user in Socket.IO
+  // SOCKET REGISTER
   // ==============================
   useEffect(() => {
     if (socket && currentUser?._id) {
@@ -64,7 +70,7 @@ const ChatPage = () => {
   }, [socket, currentUser]);
 
   // ==============================
-  // Fetch all users
+  // FETCH USERS
   // ==============================
   useEffect(() => {
     if (!currentUser) return;
@@ -80,16 +86,14 @@ const ChatPage = () => {
 
         const allUsers = res.data.data || [];
 
-        // Remove current user
-        const filtered = allUsers.filter(
+        const filteredUsers = allUsers.filter(
           (user) => user._id !== currentUser._id
         );
 
-        setUsers(filtered);
+        setUsers(filteredUsers);
 
-        // Auto-select first user
-        if (filtered.length > 0 && !selectedUser) {
-          setSelectedUser(filtered[0]);
+        if (filteredUsers.length > 0 && !selectedUser) {
+          setSelectedUser(filteredUsers[0]);
         }
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -100,7 +104,7 @@ const ChatPage = () => {
   }, [currentUser]);
 
   // ==============================
-  // Load chat history when selected user changes
+  // FETCH MESSAGES
   // ==============================
   useEffect(() => {
     if (!currentUser || !selectedUser) return;
@@ -116,7 +120,6 @@ const ChatPage = () => {
 
         const chatMessages = res.data.data || [];
 
-        // Show welcome message if no chat exists
         if (chatMessages.length === 0) {
           setMessages([
             {
@@ -145,13 +148,12 @@ const ChatPage = () => {
   }, [currentUser, selectedUser]);
 
   // ==============================
-  // Listen for real-time incoming messages
+  // RECEIVE REALTIME MESSAGE
   // ==============================
   useEffect(() => {
     if (!socket || !currentUser) return;
 
     const handleReceiveMessage = (data) => {
-      // Show only if message belongs to current open conversation
       if (
         selectedUser &&
         data.senderId === selectedUser._id &&
@@ -169,7 +171,7 @@ const ChatPage = () => {
   }, [socket, selectedUser, currentUser]);
 
   // ==============================
-  // Auto scroll to latest message
+  // AUTO SCROLL
   // ==============================
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
@@ -178,22 +180,16 @@ const ChatPage = () => {
   }, [messages]);
 
   // ==============================
-  // Send Message
+  // SEND MESSAGE
   // ==============================
-  // Replace ONLY your handleSendMessage function in ChatPage.jsx with this code
-
   const handleSendMessage = async () => {
-    // Prevent sending empty messages
     if (!message.trim() || !selectedUser || !currentUser) return;
 
-  // Store current message text before clearing input
     const messageText = message.trim();
 
-  // Clear the input immediately for better UX
     setMessage("");
 
     try {
-    // 1. Save message to MongoDB
       const res = await axios.post(
         "https://koode-23xz.onrender.com/message/sendmessage",
         {
@@ -206,29 +202,26 @@ const ChatPage = () => {
         }
       );
 
-    // 2. Get saved message from backend
       const savedMessage = res.data.data;
 
       if (!savedMessage) {
         throw new Error("No message returned from server");
       }
 
-    // 3. Show message immediately in sender UI
+      // Show instantly
       setMessages((prev) => [...prev, savedMessage]);
 
-    // 4. Send message in real time via Socket.IO
-    // IMPORTANT: Your backend socket.js listens for "sendMessage"
+      // Send realtime
       socket?.emit("sendMessage", savedMessage);
     } catch (error) {
       console.error("Error sending message:", error);
 
-      // Optional: restore message if sending fails
       setMessage(messageText);
     }
   };
 
   // ==============================
-  // Logout
+  // LOGOUT
   // ==============================
   const handleLogout = async () => {
     try {
@@ -251,19 +244,21 @@ const ChatPage = () => {
   };
 
   // ==============================
-  // Filter users by search
+  // FILTER USERS
   // ==============================
   const filteredUsers = users.filter((user) =>
     user.username?.toLowerCase().includes(search.toLowerCase())
   );
 
   // ==============================
-  // Loading Screen
+  // LOADING
   // ==============================
   if (!currentUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-purple-50">
-        <p className="text-purple-600 text-lg font-medium">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-purple-50 dark:bg-slate-950">
+        <p className="text-purple-600 dark:text-white text-lg font-medium">
+          Loading...
+        </p>
       </div>
     );
   }
@@ -271,19 +266,20 @@ const ChatPage = () => {
   // ==============================
   // UI
   // ==============================
-  // Replace ONLY the return statement in ChatPage.jsx with this code
-
   return (
-    <div className="h-screen bg-purple-50 dark:bg-slate-950 text-gray-900 dark:text-white flex overflow-hidden transition-colors duration-300 hidden md:block">
-      {/* Sidebar */}
-      <Sidebar
-        currentUser={currentUser}
-        showUserPanel={showUserPanel}
-        setShowUserPanel={setShowUserPanel}
-        onLogout={handleLogout}
-      />
+    <div className="h-screen bg-purple-50 dark:bg-slate-950 text-gray-900 dark:text-white flex overflow-hidden transition-colors duration-300">
+      
+      {/* DESKTOP SIDEBAR */}
+      <div className="hidden md:flex">
+        <Sidebar
+          currentUser={currentUser}
+          showUserPanel={showUserPanel}
+          setShowUserPanel={setShowUserPanel}
+          onLogout={handleLogout}
+        />
+      </div>
 
-      {/* User Search Panel */}
+      {/* USER PANEL */}
       {showUserPanel && (
         <UserPanel
           users={filteredUsers}
@@ -297,38 +293,47 @@ const ChatPage = () => {
         />
       )}
 
-      {/* Main Chat Section */}
+      {/* MAIN CHAT */}
       <div className="flex-1 flex flex-col bg-white dark:bg-slate-900 transition-colors duration-300">
-        {/* Header */}
+        
+        {/* HEADER */}
         <ChatHeader
           selectedUser={selectedUser}
           onlineUsers={onlineUsers}
           setShowUserPanel={setShowUserPanel}
           setShowMobileMenu={setShowMobileMenu}
+          onLogout={handleLogout}
         />
-        {/* Mobile Menu */}
-        {showMobileMenu && (
-          <div className="fixed inset-0 z-50 md:hidden">
-          {/* Overlay */}
-            <div className="absolute inset-0 bg-black/40" onClick={() => setShowMobileMenu(false)}>
-            </div>
 
-          {/* Drawer */}
-            <div className="absolute right-0 top-0 h-full w-72 bg-white dark:bg-slate-900 shadow-2xl p-5 transition-all duration-300">
-      
-              {/* Close */}
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-semibold">
+        {/* MOBILE MENU */}
+        {showMobileMenu && (
+          <div className="fixed inset-0 z-50 md:hidden flex">
+
+            {/* OVERLAY */}
+            <div
+              className="flex-1 bg-black/40"
+              onClick={() => setShowMobileMenu(false)}
+            />
+
+            {/* DRAWER */}
+            <div className="w-72 bg-white dark:bg-slate-900 shadow-2xl p-5">
+              
+              {/* TOP */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold">
                   Menu
                 </h2>
 
-                <button onClick={() => setShowMobileMenu(false)} className="text-2xl">
+                <button
+                  onClick={() => setShowMobileMenu(false)}
+                  className="text-2xl"
+                >
                   ✕
                 </button>
               </div>
 
-              {/* User */}
-              <div className="flex items-center gap-3 mb-6">
+              {/* USER */}
+              <div className="flex items-center gap-3 mb-8">
                 <div className="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">
                   {currentUser?.username?.charAt(0).toUpperCase()}
                 </div>
@@ -344,26 +349,40 @@ const ChatPage = () => {
                 </div>
               </div>
 
-              {/* Search User */}
-              <button onClick={() => {setShowUserPanel(true); setShowMobileMenu(false);}} className="w-full mb-4 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl">
+              {/* SEARCH USERS */}
+              <button
+                onClick={() => {
+                  setShowUserPanel(true);
+                  setShowMobileMenu(false);
+                }}
+                className="w-full mb-4 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl transition"
+              >
                 Search Users
               </button>
 
-              {/* Theme Toggle */}
-              <button onClick={() => {document.documentElement.classList.toggle("dark");}} className="w-full mb-4 bg-slate-200 dark:bg-slate-800 py-3 rounded-xl">
+              {/* DARK MODE */}
+              <button
+                onClick={() => {
+                  document.documentElement.classList.toggle("dark");
+                }}
+                className="w-full mb-4 bg-slate-200 dark:bg-slate-800 py-3 rounded-xl transition"
+              >
                 Toggle Theme
               </button>
 
-              {/* Logout */}
-              <button onClick={handleLogout} className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl">
+              {/* LOGOUT */}
+              <button
+                onClick={handleLogout}
+                className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl transition"
+              >
                 Logout
               </button>
             </div>
           </div>
         )}
 
-        {/* Messages */}
-        <div className="flex-1 bg-gradient-to-b from-purple-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300">
+        {/* MESSAGES */}
+        <div className="flex-1 overflow-hidden bg-gradient-to-b from-purple-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300">
           <MessageList
             messages={messages}
             currentUser={currentUser}
@@ -372,7 +391,7 @@ const ChatPage = () => {
           />
         </div>
 
-        {/* Input Area */}
+        {/* INPUT */}
         <div className="bg-white dark:bg-slate-900 border-t border-purple-100 dark:border-slate-800 transition-colors duration-300">
           <MessageInput
             message={message}
