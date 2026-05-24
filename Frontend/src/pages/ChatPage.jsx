@@ -31,6 +31,8 @@ const ChatPage = () => {
 
   const messagesEndRef = useRef(null);
 
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+
   // ==============================
   // Load current user from localStorage
   // ==============================
@@ -272,7 +274,7 @@ const ChatPage = () => {
   // Replace ONLY the return statement in ChatPage.jsx with this code
 
   return (
-    <div className="h-screen bg-purple-50 dark:bg-slate-950 text-gray-900 dark:text-white flex overflow-hidden transition-colors duration-300">
+    <div className="h-screen bg-purple-50 dark:bg-slate-950 text-gray-900 dark:text-white flex overflow-hidden transition-colors duration-300 hidden md:block">
       {/* Sidebar */}
       <Sidebar
         currentUser={currentUser}
@@ -302,7 +304,63 @@ const ChatPage = () => {
           selectedUser={selectedUser}
           onlineUsers={onlineUsers}
           setShowUserPanel={setShowUserPanel}
+          setShowMobileMenu={setShowMobileMenu}
         />
+        {/* Mobile Menu */}
+        {showMobileMenu && (
+          <div className="fixed inset-0 z-50 md:hidden">
+          {/* Overlay */}
+            <div className="absolute inset-0 bg-black/40" onClick={() => setShowMobileMenu(false)}>
+            </div>
+
+          {/* Drawer */}
+            <div className="absolute right-0 top-0 h-full w-72 bg-white dark:bg-slate-900 shadow-2xl p-5 transition-all duration-300">
+      
+              {/* Close */}
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-semibold">
+                  Menu
+                </h2>
+
+                <button onClick={() => setShowMobileMenu(false)} className="text-2xl">
+                  ✕
+                </button>
+              </div>
+
+              {/* User */}
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">
+                  {currentUser?.username?.charAt(0).toUpperCase()}
+                </div>
+
+                <div>
+                  <p className="font-semibold">
+                    {currentUser?.username}
+                  </p>
+
+                  <p className="text-sm text-gray-500 dark:text-slate-400">
+                    Online
+                  </p>
+                </div>
+              </div>
+
+              {/* Search User */}
+              <button onClick={() => {setShowUserPanel(true); setShowMobileMenu(false);}} className="w-full mb-4 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl">
+                Search Users
+              </button>
+
+              {/* Theme Toggle */}
+              <button onClick={() => {document.documentElement.classList.toggle("dark");}} className="w-full mb-4 bg-slate-200 dark:bg-slate-800 py-3 rounded-xl">
+                Toggle Theme
+              </button>
+
+              {/* Logout */}
+              <button onClick={handleLogout} className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl">
+                Logout
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Messages */}
         <div className="flex-1 bg-gradient-to-b from-purple-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300">
