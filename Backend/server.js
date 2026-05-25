@@ -33,8 +33,7 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",
-      "https://koode-gamma.vercel.app",
+      "https://koode-gamma.vercel.app"
     ],
     credentials: true,
   })
