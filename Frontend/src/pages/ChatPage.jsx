@@ -382,7 +382,7 @@ const ChatPage = () => {
         )}
 
         {/* MESSAGES */}
-        <div className="flex-1 overflow-hidden bg-gradient-to-b from-purple-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300">
+        <div className="flex-1 overflow-hidden bg-gradient-to-b from-purple-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300 flex flex-col">
           <MessageList
             messages={messages}
             currentUser={currentUser}

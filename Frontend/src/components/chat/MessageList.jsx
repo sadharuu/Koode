@@ -7,9 +7,10 @@ const MessageList = ({
   messagesEndRef,
 }) => {
   return (
-    <div className="flex-1 overflow-y-auto bg-gradient-to-b from-purple-50 to-white dark:from-slate-950 dark:to-slate-900 px-6 py-4 transition-colors duration-300">
+    <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-4">
+      
       {messages.length === 0 ? (
-        <div className="flex h-full items-center justify-center text-gray-400 dark:text-slate-400">
+        <div className="flex h-full items-center justify-center text-gray-400 dark:text-slate-500">
           {selectedUser
             ? `Start a conversation with ${selectedUser.username}`
             : "Select a user to start chatting"}
@@ -21,21 +22,28 @@ const MessageList = ({
           return (
             <div
               key={index}
-              className={`mb-4 flex ${
+              className={`flex ${
                 isMine ? "justify-end" : "justify-start"
               }`}
             >
               <div
-                className={`max-w-[75%] rounded-2xl px-4 py-3 shadow-sm transition-colors duration-300 ${
-                  isMine
-                    ? "rounded-br-md bg-gradient-to-r from-purple-600 to-violet-500 text-white"
-                    : "rounded-bl-md bg-purple-100 text-purple-900 dark:bg-slate-800 dark:text-slate-100"
-                }`}
+                className={`
+                  max-w-[85%] md:max-w-[70%]
+                  px-4 py-3 rounded-2xl shadow-sm
+                  break-words
+                  ${
+                    isMine
+                      ? "bg-gradient-to-r from-purple-600 to-violet-500 text-white rounded-br-md"
+                      : "bg-purple-100 dark:bg-slate-800 text-purple-900 dark:text-white rounded-bl-md"
+                  }
+                `}
               >
-                {/* Message Text */}
-                <p className="break-words">{msg.message}</p>
+                {/* MESSAGE */}
+                <p className="whitespace-pre-wrap break-words text-sm md:text-base">
+                  {msg.message}
+                </p>
 
-                {/* Time */}
+                {/* TIME */}
                 <p
                   className={`mt-1 text-[11px] ${
                     isMine
@@ -51,7 +59,7 @@ const MessageList = ({
         })
       )}
 
-      {/* Auto Scroll Anchor */}
+      {/* AUTO SCROLL */}
       <div ref={messagesEndRef}></div>
     </div>
   );
