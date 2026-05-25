@@ -45,9 +45,7 @@ app.use(morgan("dev"));
 // ==============================
 // STATIC FOLDER FOR MULTER
 // ==============================
-app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "uploads"))
+app.use("/uploads",express.static(path.join(__dirname, "uploads"))
 );
 
 // ==============================
