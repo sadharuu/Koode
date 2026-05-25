@@ -56,5 +56,31 @@ const deleteMessage=async(req,res)=>{
     }
 }
 
+const uploadImage = async (req, res) => {
+  try {
+    const { senderId, receiverId } = req.body;
 
-module.exports={sendMessage,showMessage,deleteMessage}
+    const imageUrl = req.file.path;
+
+    const newMessage = await Message.create({
+      senderId,
+      receiverId,
+      image: imageUrl,
+      message: "",
+    });
+
+    res.status(200).json({
+      msg: "Image uploaded",
+      data: newMessage,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      msg: "Server error",
+    });
+  }
+};
+
+
+module.exports={sendMessage,showMessage,deleteMessage,uploadImage}

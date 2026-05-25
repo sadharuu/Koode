@@ -39,9 +39,19 @@ const MessageList = ({
                 `}
               >
                 {/* MESSAGE */}
-                <p className="whitespace-pre-wrap break-words text-sm md:text-base">
-                  {msg.message}
-                </p>
+                {msg.message && (
+                  <p className="whitespace-pre-wrap break-words text-sm md:text-base">
+                    {msg.message}
+                  </p>
+                )}
+
+                {msg.image && (
+                  <img
+                    src={`https://koode-23xz.onrender.com/${msg.image}`}
+                    alt="chat"
+                    className="mt-2 max-w-full rounded-xl"
+                  />
+                )}
 
                 {/* TIME */}
                 <p
