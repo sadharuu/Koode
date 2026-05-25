@@ -102,7 +102,7 @@ const Signup = () => {
 
       // API
       await axios.post(
-        "https://koode-23xz.onrender.com/user/createUser",
+        "https://koode-23xz.onrender.com/user/createuser",
         data,
         {
           headers: {

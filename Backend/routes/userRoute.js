@@ -13,7 +13,7 @@ const upload = require("../middlewares/multerMiddleware");
 // ==============================
 
 // Register user with profile image
-userRouter.post("/createUser",upload.single("profilePic"),userController.createUser);
+userRouter.post("/createuser",upload.single("profilePic"),userController.createUser);
 
 // Login
 userRouter.post("/login",userController.login);
