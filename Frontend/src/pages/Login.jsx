@@ -41,7 +41,7 @@ const Login = () => {
         email: formData.email,
       };
 
-      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("user", JSON.stringify(res.data.user));
 
       // Redirect to chat page
       navigate("/chat");

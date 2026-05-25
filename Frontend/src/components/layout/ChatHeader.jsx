@@ -42,8 +42,14 @@ const ChatHeader = ({
           <div className="flex items-center gap-3">
             {/* Avatar */}
             <div className="relative">
-              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-600 to-violet-500 text-white flex items-center justify-center font-bold text-lg">
-                {selectedUser.username?.charAt(0).toUpperCase() || "U"}
+              <div className="w-12 h-12 rounded-full overflow-hidden bg-purple-200">
+                {selectedUser?.profilePic ? (
+                  <img src={`https://koode-23xz.onrender.com/${selectedUser.profilePic}`} alt="Profile" className="w-full h-full object-cover"/>
+                  ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-purple-600 to-violet-500 text-white flex items-center justify-center font-bold text-lg">
+                    {selectedUser.username?.charAt(0).toUpperCase() || "U"}
+                  </div>
+                )}
               </div>
 
               {/* Online Dot */}

@@ -66,8 +66,12 @@ const Sidebar = ({
 
       {/* Current User Avatar */}
       <div className="mt-6 flex flex-col items-center">
-        <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-lg font-bold">
-          {currentUser?.username?.charAt(0).toUpperCase() || "U"}
+        <div className="w-12 h-12 rounded-full overflow-hidden bg-white/20">
+          {currentUser?.profilePic ? 
+            (<img src={`https://koode-23xz.onrender.com/${currentUser.profilePic}`} alt="Profile" className="w-full h-full object-cover"/>)
+              :
+            (<div className="w-full h-full flex items-center justify-center text-lg font-bold"> {currentUser?.username?.charAt(0).toUpperCase() || "U"}</div>
+          )}
         </div>
 
         <p className="mt-2 text-[10px] text-center text-white/80 px-1">

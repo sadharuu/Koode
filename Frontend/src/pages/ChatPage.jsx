@@ -334,8 +334,14 @@ const ChatPage = () => {
 
               {/* USER */}
               <div className="flex items-center gap-3 mb-8">
-                <div className="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">
-                  {currentUser?.username?.charAt(0).toUpperCase()}
+                <div className="w-12 h-12 rounded-full overflow-hidden bg-purple-200">
+                  {currentUser?.profilePic ? (
+                    <img src={`https://koode-23xz.onrender.com/${currentUser.profilePic}`} alt="Profile" className="w-full h-full object-cover"/>
+                  ) : (
+                    <div className="w-full h-full bg-purple-600 text-white flex items-center justify-center font-bold">
+                      {currentUser?.username?.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                 </div>
 
                 <div>
