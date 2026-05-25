@@ -2,7 +2,8 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const morgan = require("morgan");
-const cookieParser = require('cookie-parser');
+const cookieParser = require("cookie-parser");
+const path = require("path");
 
 const connectDB = require("./config/db");
 const initializeSocket = require("./sockets/socket");
@@ -10,40 +11,80 @@ const initializeSocket = require("./sockets/socket");
 const messageRoute = require("./routes/messageRoute");
 const userRoute = require("./routes/userRoute");
 
-// Create Express app
+// ==============================
+// CREATE APP
+// ==============================
 const app = express();
 
-// Connect to MongoDB
+// ==============================
+// CONNECT DATABASE
+// ==============================
 connectDB();
 
+// ==============================
+// MIDDLEWARE
+// ==============================
 app.use(express.json());
+
+app.use(express.urlencoded({ extended: true }));
+
 app.use(cookieParser());
 
-// Middleware
-app.use(cors({
-  origin: "https://koode-gamma.vercel.app", // Frontend URL
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://koode-gamma.vercel.app",
+    ],
+    credentials: true,
+  })
+);
+
 app.use(morgan("dev"));
 
+// ==============================
+// STATIC FOLDER FOR MULTER
+// ==============================
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"))
+);
 
-// Routes
+// ==============================
+// ROUTES
+// ==============================
 app.use("/message", messageRoute);
+
 app.use("/user", userRoute);
 
-// Create HTTP server from Express app
+// ==============================
+// CREATE HTTP SERVER
+// ==============================
 const server = http.createServer(app);
 
-// Initialize Socket.IO
+// ==============================
+// INITIALIZE SOCKET.IO
+// ==============================
 const io = initializeSocket(server);
 
-// Optional: make io available in controllers/routes
+// Optional
 app.set("io", io);
 
-// Port
+// ==============================
+// TEST ROUTE
+// ==============================
+app.get("/", (req, res) => {
+  res.send("Koode Backend Running 🚀");
+});
+
+// ==============================
+// PORT
+// ==============================
 const PORT = process.env.PORT || 3000;
 
-// Start server using server.listen (not app.listen)
+// ==============================
+// START SERVER
+// ==============================
 server.listen(PORT, () => {
   console.log(`Server is running on PORT: ${PORT}`);
 });
