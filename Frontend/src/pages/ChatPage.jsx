@@ -22,6 +22,7 @@ const ChatPage = () => {
   const [currentUser, setCurrentUser] = useState(null);
 
   const [users, setUsers] = useState([]);
+
   const [selectedUser, setSelectedUser] = useState(null);
 
   const [search, setSearch] = useState("");
@@ -208,10 +209,10 @@ const ChatPage = () => {
         throw new Error("No message returned from server");
       }
 
-      // Show instantly
+      // SHOW IN UI
       setMessages((prev) => [...prev, savedMessage]);
 
-      // Send realtime
+      // REALTIME
       socket?.emit("sendMessage", savedMessage);
     } catch (error) {
       console.error("Error sending message:", error);
@@ -294,16 +295,18 @@ const ChatPage = () => {
       )}
 
       {/* MAIN CHAT */}
-      <div className="flex-1 flex flex-col bg-white dark:bg-slate-900 transition-colors duration-300">
-        
+      <div className="flex-1 flex flex-col h-screen bg-white dark:bg-slate-900 transition-colors duration-300">
+
         {/* HEADER */}
-        <ChatHeader
-          selectedUser={selectedUser}
-          onlineUsers={onlineUsers}
-          setShowUserPanel={setShowUserPanel}
-          setShowMobileMenu={setShowMobileMenu}
-          onLogout={handleLogout}
-        />
+        <div className="shrink-0">
+          <ChatHeader
+            selectedUser={selectedUser}
+            onlineUsers={onlineUsers}
+            setShowUserPanel={setShowUserPanel}
+            setShowMobileMenu={setShowMobileMenu}
+            onLogout={handleLogout}
+          />
+        </div>
 
         {/* MOBILE MENU */}
         {showMobileMenu && (
@@ -316,8 +319,8 @@ const ChatPage = () => {
             />
 
             {/* DRAWER */}
-            <div className="w-72 bg-white dark:bg-slate-900 shadow-2xl p-5">
-              
+            <div className="w-72 bg-white dark:bg-slate-900 shadow-2xl p-5 overflow-y-auto">
+
               {/* TOP */}
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold">
@@ -334,9 +337,14 @@ const ChatPage = () => {
 
               {/* USER */}
               <div className="flex items-center gap-3 mb-8">
+
                 <div className="w-12 h-12 rounded-full overflow-hidden bg-purple-200">
                   {currentUser?.profilePic ? (
-                    <img src={`https://koode-23xz.onrender.com/${currentUser.profilePic}`} alt="Profile" className="w-full h-full object-cover"/>
+                    <img
+                      src={`https://koode-23xz.onrender.com/${currentUser.profilePic}`}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <div className="w-full h-full bg-purple-600 text-white flex items-center justify-center font-bold">
                       {currentUser?.username?.charAt(0).toUpperCase()}
@@ -387,24 +395,32 @@ const ChatPage = () => {
           </div>
         )}
 
-        {/* MESSAGES */}
-        <div className="flex-1 overflow-hidden bg-gradient-to-b from-purple-50 to-white dark:from-slate-950 dark:to-slate-900 transition-colors duration-300 flex flex-col">
-          <MessageList
-            messages={messages}
-            currentUser={currentUser}
-            selectedUser={selectedUser}
-            messagesEndRef={messagesEndRef}
-          />
-        </div>
+        {/* CHAT BODY */}
+        <div className="flex-1 flex flex-col overflow-hidden">
 
-        {/* INPUT */}
-        <div className="bg-white dark:bg-slate-900 border-t border-purple-100 dark:border-slate-800 transition-colors duration-300">
-          <MessageInput
-            message={message}
-            setMessage={setMessage}
-            handleSendMessage={handleSendMessage}
-            disabled={!selectedUser}
-          />
+          {/* MESSAGES AREA */}
+          <div className="flex-1 overflow-hidden">
+            <MessageList
+              messages={messages}
+              currentUser={currentUser}
+              selectedUser={selectedUser}
+              messagesEndRef={messagesEndRef}
+            />
+          </div>
+
+          {/* FIXED INPUT */}
+          <div className="shrink-0 sticky bottom-0 z-40 bg-white dark:bg-slate-900 border-t border-purple-100 dark:border-slate-800">
+            <MessageInput
+              message={message}
+              setMessage={setMessage}
+              handleSendMessage={handleSendMessage}
+              disabled={!selectedUser}
+              currentUser={currentUser}
+              selectedUser={selectedUser}
+              socket={socket}
+              setMessages={setMessages}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -11,8 +11,10 @@ const MessageList = ({
       className="
         flex-1
         overflow-y-auto
-        px-3 md:px-6
+        px-3
+        md:px-6
         py-4
+        pb-28
         space-y-4
         bg-gradient-to-b
         from-purple-50
@@ -24,18 +26,22 @@ const MessageList = ({
     >
       {/* EMPTY CHAT */}
       {messages.length === 0 ? (
-        <div className="flex h-full items-center justify-center text-center text-gray-400 dark:text-slate-500 px-4">
-          {selectedUser
-            ? `Start a conversation with ${selectedUser.username} 👋`
-            : "Select a user to start chatting"}
+        <div className="flex h-full items-center justify-center text-center px-4">
+          <p className="text-gray-400 dark:text-slate-500 text-sm md:text-base">
+            {selectedUser
+              ? `Start a conversation with ${selectedUser.username} 👋`
+              : "Select a user to start chatting"}
+          </p>
         </div>
       ) : (
         messages.map((msg, index) => {
-          const isMine = msg.senderId === currentUser?._id;
+          const isMine =
+            msg.senderId === currentUser?._id ||
+            msg.senderId?._id === currentUser?._id;
 
           return (
             <div
-              key={index}
+              key={msg._id || index}
               className={`flex ${
                 isMine ? "justify-end" : "justify-start"
               }`}
@@ -52,6 +58,7 @@ const MessageList = ({
                   break-words
                   transition-all
                   duration-300
+                  backdrop-blur-sm
                   ${
                     isMine
                       ? `
@@ -71,27 +78,33 @@ const MessageList = ({
                   }
                 `}
               >
-                {/* TEXT MESSAGE */}
+                {/* MESSAGE TEXT */}
                 {msg.message && (
-                  <p className="whitespace-pre-wrap break-words text-sm md:text-base leading-relaxed">
+                  <p
+                    className="
+                      whitespace-pre-wrap
+                      break-words
+                      text-sm
+                      md:text-base
+                      leading-relaxed
+                    "
+                  >
                     {msg.message}
                   </p>
                 )}
 
-                {/* IMAGE MESSAGE */}
+                {/* IMAGE */}
                 {msg.image && (
-                  <div className="mt-2 overflow-hidden rounded-xl">
+                  <div className="mt-3 overflow-hidden rounded-2xl">
                     <img
-                      src={`https://koode-23xz.onrender.com/${msg.image.replace(
-                        "\\",
-                        "/"
-                      )}`}
+                      src={msg.image}
                       alt="chat"
+                      loading="lazy"
                       className="
                         max-h-[320px]
                         w-full
                         object-cover
-                        rounded-xl
+                        rounded-2xl
                         border
                         border-white/10
                         hover:scale-[1.02]
@@ -124,9 +137,6 @@ const MessageList = ({
           );
         })
       )}
-
-      {/* EXTRA SPACE FOR FIXED INPUT */}
-      <div className="h-2"></div>
 
       {/* AUTO SCROLL */}
       <div ref={messagesEndRef}></div>
