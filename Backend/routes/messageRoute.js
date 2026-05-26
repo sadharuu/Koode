@@ -3,7 +3,7 @@ const messageRouter=express.Router()
 const messageController=require('../controllers/messageController')
 const multer=require('multer')
 const path=require('path')
-const upload = multer({ storage });
+
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -18,8 +18,10 @@ const storage = multer.diskStorage({
   },
 });
 
+const upload = multer({ storage });
 
-router.post("/uploadimage",upload.single("image"),messageController.uploadImage);
+
+messageRouter.post("/uploadimage",upload.single("image"),messageController.uploadImage);
 
 
 messageRouter.post('/sendmessage',messageController.sendMessage)
