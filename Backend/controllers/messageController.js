@@ -1,65 +1,115 @@
-const Message=require('../models/messageModel')
+const Message = require("../models/messageModel");
 
-const sendMessage=async(req,res)=>{
-    const{senderId,receiverId,message}= req.body
+// ==============================
+// SEND TEXT MESSAGE
+// ==============================
+const sendMessage = async (req, res) => {
+  try {
+    const { senderId, receiverId, message } = req.body;
 
-    try{
-        const newdata=await new Message({
-            senderId,
-            receiverId,
-            message
-        })
-        await newdata.save()
-        res.status(201).json({msg: "created successfully", data: newdata})
+    // Validation
+    if (!senderId || !receiverId || !message) {
+      return res.status(400).json({
+        msg: "All fields are required",
+      });
     }
-    catch(error){
-        console.log(error);
-        res.status(500).json({msg: "server error"})
-    }
-}
 
-const showMessage=async(req,res)=>{
-    const {senderId, receiverId} = req.params
-    try {
-        const messages = await Message.find({
-          $or: [
-            { senderId, receiverId },
-            { senderId: receiverId, receiverId: senderId },
-          ],
-        }).sort({ createdAt: 1 });
+    const newMessage = await Message.create({
+      senderId,
+      receiverId,
+      message,
+    });
 
-        res.status(200).json({
-        msg: "Messages fetched successfully",
-          data: messages,
-        });
-    } catch (error) {
-        console.error("Error fetching messages:", error);
-        res.status(500).json({
-          msg: "Server error",
-          data: [],
-        });
-    }
+    res.status(201).json({
+      msg: "Message sent successfully",
+      data: newMessage,
+    });
+  } catch (error) {
+    console.log("Send Message Error:", error);
+
+    res.status(500).json({
+      msg: "Server error",
+    });
+  }
 };
 
+// ==============================
+// SHOW MESSAGES
+// ==============================
+const showMessage = async (req, res) => {
+  try {
+    const { senderId, receiverId } = req.params;
 
-const deleteMessage=async(req,res)=>{
-    try{
-        const {id}= req.params
-        const deletedata=await Message.findByIdAndDelete(id)
-        if(!deletedata){
-            return res.status(404).json({msg: "message not found"})
-        }
-        res.status(200).json({msg: "message deleted"})
-    }
-    catch(error){
-        res.status(500).json({msg: "server error"})
-    }
-}
+    const messages = await Message.find({
+      $or: [
+        {
+          senderId,
+          receiverId,
+        },
+        {
+          senderId: receiverId,
+          receiverId: senderId,
+        },
+      ],
+    }).sort({ createdAt: 1 });
 
+    res.status(200).json({
+      msg: "Messages fetched successfully",
+      data: messages,
+    });
+  } catch (error) {
+    console.log("Fetch Messages Error:", error);
+
+    res.status(500).json({
+      msg: "Server error",
+      data: [],
+    });
+  }
+};
+
+// ==============================
+// DELETE MESSAGE
+// ==============================
+const deleteMessage = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedMessage =
+      await Message.findByIdAndDelete(id);
+
+    if (!deletedMessage) {
+      return res.status(404).json({
+        msg: "Message not found",
+      });
+    }
+
+    res.status(200).json({
+      msg: "Message deleted successfully",
+    });
+  } catch (error) {
+    console.log("Delete Message Error:", error);
+
+    res.status(500).json({
+      msg: "Server error",
+    });
+  }
+};
+
+// ==============================
+// UPLOAD IMAGE MESSAGE
+// ==============================
 const uploadImage = async (req, res) => {
   try {
     const { senderId, receiverId } = req.body;
 
+    // CHECK FILE
+    if (!req.file) {
+      return res.status(400).json({
+        msg: "No image uploaded",
+      });
+    }
+
+    // CLOUDINARY IMAGE URL
     const imageUrl = req.file.path;
 
     const newMessage = await Message.create({
@@ -69,12 +119,12 @@ const uploadImage = async (req, res) => {
       message: "",
     });
 
-    res.status(200).json({
-      msg: "Image uploaded",
+    res.status(201).json({
+      msg: "Image uploaded successfully",
       data: newMessage,
     });
   } catch (error) {
-    console.log(error);
+    console.log("Upload Image Error:", error);
 
     res.status(500).json({
       msg: "Server error",
@@ -82,5 +132,9 @@ const uploadImage = async (req, res) => {
   }
 };
 
-
-module.exports={sendMessage,showMessage,deleteMessage,uploadImage}
+module.exports = {
+  sendMessage,
+  showMessage,
+  deleteMessage,
+  uploadImage,
+};

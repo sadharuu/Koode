@@ -1,38 +1,42 @@
-const express=require('express')
-const messageRouter=express.Router()
-const messageController=require('../controllers/messageController')
-const multer=require('multer')
-const path=require('path')
+const express = require("express");
 
+const messageRouter = express.Router();
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
+const upload = require("../middlewares/multerMiddleware");
 
-  filename: (req, file, cb) => {
-    cb(
-      null,
-      Date.now() + path.extname(file.originalname)
-    );
-  },
-});
+const messageController = require("../controllers/messageController");
 
-const upload = multer({ storage });
+// ==============================
+// IMAGE MESSAGE UPLOAD
+// ==============================
+messageRouter.post(
+  "/uploadimage",
+  upload.single("image"),
+  messageController.uploadImage
+);
 
+// ==============================
+// TEXT MESSAGE
+// ==============================
+messageRouter.post(
+  "/sendmessage",
+  messageController.sendMessage
+);
 
-messageRouter.post("/uploadimage",upload.single("image"),messageController.uploadImage);
+// ==============================
+// SHOW CHAT
+// ==============================
+messageRouter.get(
+  "/showmessage/:senderId/:receiverId",
+  messageController.showMessage
+);
 
+// ==============================
+// DELETE MESSAGE
+// ==============================
+messageRouter.delete(
+  "/deletemessage/:id",
+  messageController.deleteMessage
+);
 
-messageRouter.post('/sendmessage',messageController.sendMessage)
-messageRouter.get('/showmessage/:senderId/:receiverId',messageController.showMessage)
-messageRouter.delete('/deletemessage/:id',messageController.deleteMessage)
-
-
-
-
-
-
-
-
-module.exports=messageRouter
+module.exports = messageRouter;
