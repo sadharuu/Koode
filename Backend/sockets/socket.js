@@ -6,7 +6,10 @@ const onlineUsers = new Map();
 const initializeSocket = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: "https://koode-gamma.vercel.app",
+      origin:[
+          "http://localhost:5173",
+          "https://koode-gamma.vercel.app",
+      ],
       methods: ["GET", "POST"],
       credentials: true,
     },

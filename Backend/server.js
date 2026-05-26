@@ -33,7 +33,8 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: [
-      "https://koode-gamma.vercel.app"
+      "http://localhost:5173",
+      "https://koode-gamma.vercel.app",
     ],
     credentials: true,
   })
@@ -66,12 +67,7 @@ const io = initializeSocket(server);
 // Optional
 app.set("io", io);
 
-// ==============================
-// TEST ROUTE
-// ==============================
-app.get("/", (req, res) => {
-  res.send("Koode Backend Running 🚀");
-});
+
 
 // ==============================
 // PORT
