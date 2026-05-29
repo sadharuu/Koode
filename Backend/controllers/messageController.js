@@ -103,26 +103,19 @@ const uploadImage = async (req, res) => {
   try {
     const { senderId, receiverId } = req.body;
 
-    // CHECK FILE
     if (!req.file) {
       return res.status(400).json({
         msg: "No image uploaded",
       });
     }
 
-    // CLOUDINARY IMAGE URL
-    const result = await cloudinary.uploader.upload(
-      req.file.path,
-      {
-        folder: "koode_messages",
-      }
-    );
+    // Image already uploaded to Cloudinary
+    const imageUrl = req.file.path;
 
-    // Save message
     const newMessage = await Message.create({
       senderId,
       receiverId,
-      image: result.secure_url,
+      image: imageUrl,
       message: "",
     });
 
@@ -131,7 +124,7 @@ const uploadImage = async (req, res) => {
       data: newMessage,
     });
   } catch (error) {
-    console.log(error);
+    console.log("Upload Error:", error);
 
     res.status(500).json({
       msg: "Server error",
