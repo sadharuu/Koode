@@ -101,6 +101,7 @@ const deleteMessage = async (req, res) => {
 // ==============================
 const uploadImage = async (req, res) => {
   try {
+    console.log("REQ FILE:", req.file);
     const { senderId, receiverId } = req.body;
 
     if (!req.file) {
@@ -109,15 +110,11 @@ const uploadImage = async (req, res) => {
       });
     }
 
-    // Image already uploaded to Cloudinary
-    const imageUrl = req.file.path;
-    console.log("REQ FILE:", req.file);
-    console.log("REQ BODY:", req.body);
 
     const newMessage = await Message.create({
       senderId,
       receiverId,
-      image: imageUrl,
+      image: req.file.path,
       message: "",
     });
 
