@@ -111,6 +111,8 @@ const uploadImage = async (req, res) => {
 
     // Image already uploaded to Cloudinary
     const imageUrl = req.file.path;
+    console.log("REQ FILE:", req.file);
+    console.log("REQ BODY:", req.body);
 
     const newMessage = await Message.create({
       senderId,
