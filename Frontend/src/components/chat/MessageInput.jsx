@@ -69,9 +69,10 @@ const MessageInput = ({
     }
 
     // Preview
-    const imageURL = URL.createObjectURL(file);
+    
 
-    setPreviewImage(imageURL);
+    URL.revokeObjectURL(previewImage);
+    setPreviewImage(null);
 
     try {
       setUploading(true);
@@ -332,11 +333,7 @@ const MessageInput = ({
         <button
           type="button"
           onClick={handleSendMessage}
-          disabled={
-            disabled ||
-            (!message.trim() &&
-              !previewImage)
-          }
+          disabled={disabled || uploading || !message.trim()}
           className="
             flex
             h-12
