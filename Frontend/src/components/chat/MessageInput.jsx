@@ -21,7 +21,8 @@ const MessageInput = ({
   const [showEmojiPicker, setShowEmojiPicker] =
     useState(false);
 
-  const [uploading, setUploading] = useState(false);
+  const [uploading, setUploading] =
+    useState(false);
 
   const [previewImage, setPreviewImage] =
     useState(null);
@@ -64,15 +65,17 @@ const MessageInput = ({
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
 
-    if (!file || !currentUser || !selectedUser) {
+    if (!file) return;
+
+    if (!currentUser || !selectedUser) {
       return;
     }
 
-    // Preview
-    
+    // Create preview
+    const imagePreview =
+      URL.createObjectURL(file);
 
-    URL.revokeObjectURL(previewImage);
-    setPreviewImage(null);
+    setPreviewImage(imagePreview);
 
     try {
       setUploading(true);
@@ -95,18 +98,15 @@ const MessageInput = ({
         "https://koode-23xz.onrender.com/message/uploadimage",
         formData,
         {
-          headers: {
-            "Content-Type":
-              "multipart/form-data",
-          },
-
           withCredentials: true,
         }
       );
 
+      console.log("UPLOAD RESPONSE:", res.data);
+
       const savedMessage = res.data.data;
 
-      // Show instantly
+      // Add instantly to UI
       setMessages((prev) => [
         ...prev,
         savedMessage,
@@ -118,18 +118,23 @@ const MessageInput = ({
         savedMessage
       );
 
-      // Remove preview after upload
+      // Remove preview
+      URL.revokeObjectURL(imagePreview);
+
       setPreviewImage(null);
 
-      // Reset file input
+      // Reset input
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
     } catch (error) {
       console.error(
         "Image upload failed:",
-        error
+        error.response?.data || error.message
       );
+
+      // Remove preview on fail
+      URL.revokeObjectURL(imagePreview);
 
       setPreviewImage(null);
     } finally {
@@ -170,9 +175,13 @@ const MessageInput = ({
           />
 
           <button
-            onClick={() =>
-              setPreviewImage(null)
-            }
+            onClick={() => {
+              URL.revokeObjectURL(
+                previewImage
+              );
+
+              setPreviewImage(null);
+            }}
             className="
               absolute
               -top-2
@@ -297,7 +306,7 @@ const MessageInput = ({
             "
           />
 
-          {/* HIDDEN FILE INPUT */}
+          {/* FILE INPUT */}
           <input
             type="file"
             accept="image/*"
@@ -309,7 +318,9 @@ const MessageInput = ({
           {/* CAMERA BUTTON */}
           <button
             type="button"
-            disabled={uploading || disabled}
+            disabled={
+              uploading || disabled
+            }
             onClick={() =>
               fileInputRef.current?.click()
             }
@@ -333,7 +344,11 @@ const MessageInput = ({
         <button
           type="button"
           onClick={handleSendMessage}
-          disabled={disabled || uploading || !message.trim()}
+          disabled={
+            disabled ||
+            uploading ||
+            !message.trim()
+          }
           className="
             flex
             h-12
@@ -356,7 +371,7 @@ const MessageInput = ({
         </button>
       </div>
 
-      {/* UPLOADING TEXT */}
+      {/* UPLOADING */}
       {uploading && (
         <p className="mt-2 text-xs text-purple-500">
           Uploading image...
