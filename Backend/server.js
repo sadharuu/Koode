@@ -1,5 +1,3 @@
-const express = require("express");
-const http = require("http");
 const cors = require("cors");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
@@ -8,8 +6,15 @@ const path = require("path");
 const connectDB = require("./config/db");
 const initializeSocket = require("./sockets/socket");
 
+require("dotenv").config();
+
+const express = require("express");
+const http = require("http");
+
 const messageRoute = require("./routes/messageRoute");
 const userRoute = require("./routes/userRoute");
+
+
 
 // ==============================
 // CREATE APP
