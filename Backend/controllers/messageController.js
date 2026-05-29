@@ -1,4 +1,5 @@
 const Message = require("../models/messageModel");
+const cloudinary=require("../config/cloudinary");
 
 // ==============================
 // SEND TEXT MESSAGE
@@ -110,24 +111,31 @@ const uploadImage = async (req, res) => {
     }
 
     // CLOUDINARY IMAGE URL
-    const imageUrl = req.file.path;
+    const result = await cloudinary.uploader.upload(
+      req.file.path,
+      {
+        folder: "koode_messages",
+      }
+    );
 
+    // Save message
     const newMessage = await Message.create({
       senderId,
       receiverId,
-      image: imageUrl,
+      image: result.secure_url,
       message: "",
     });
 
-    res.status(201).json({
+    res.status(200).json({
       msg: "Image uploaded successfully",
       data: newMessage,
     });
   } catch (error) {
-    console.log("Upload Image Error:", error);
+    console.log(error);
 
     res.status(500).json({
       msg: "Server error",
+      error: error.message,
     });
   }
 };

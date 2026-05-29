@@ -1,7 +1,7 @@
+require("dotenv").config();
 const cors = require("cors");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
-const path = require("path");
 
 const connectDB = require("./config/db");
 const initializeSocket = require("./sockets/socket");
@@ -13,6 +13,7 @@ const http = require("http");
 
 const messageRoute = require("./routes/messageRoute");
 const userRoute = require("./routes/userRoute");
+
 
 
 
