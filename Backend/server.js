@@ -76,6 +76,23 @@ app.set("io", io);
 // ==============================
 const PORT = process.env.PORT || 3000;
 
+
+// ==============================
+// GLOBAL ERROR HANDLER (Add at the very end of server.js)
+// ==============================
+app.use((err, req, res, next) => {
+  // 1. Force the server logs to print the full stack trace object properly
+  console.error("--- GLOBAL ERROR INTERCEPTED ---");
+  console.error(err); 
+
+  // 2. Prevent sending [object Object] to the frontend by forcing a clean JSON string
+  res.status(500).json({
+    msg: "An internal server error occurred in the middleware layer.",
+    error: err.message || "No error message provided",
+    stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack // Hides stack trace in production for security
+  });
+});
+
 // ==============================
 // START SERVER
 // ==============================
