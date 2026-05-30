@@ -1,6 +1,6 @@
 const express = require("express");
 const messageRouter = express.Router();
-const upload = require("../middleware/multerMiddleware"); // Adjust this path to your middleware location
+const upload = require("../middlewares/multerMiddleware");
 const { uploadImage, sendMessage, showMessage, deleteMessage } = require("../controllers/messageController");
 
 // The key inside single() MUST match your frontend FormData field key name (e.g., formData.append('image', file))
