@@ -7,6 +7,11 @@ const cloudinary=require("../config/cloudinary");
 const sendMessage = async (req, res) => {
   try {
     const { senderId, receiverId, message } = req.body;
+    const image = req.file ? req.file.path : ""; // or however you extract the image string
+
+    if (!message && !image) {
+      return res.status(400).json({ error: "Cannot send an empty message." });
+    }
 
     // Validation
     if (!senderId || !receiverId || !message) {
@@ -99,34 +104,58 @@ const deleteMessage = async (req, res) => {
 // ==============================
 // UPLOAD IMAGE MESSAGE
 // ==============================
+// ==============================
+// UPLOAD IMAGE MESSAGE
+// ==============================
 const uploadImage = async (req, res) => {
   try {
-    console.log("REQ FILE:", req.file);
+    console.log("REQ FILE RECEIVED:", req.file);
+    console.log("REQ BODY RECEIVED:", req.body);
+
     const { senderId, receiverId } = req.body;
 
-    if (!req.file) {
+    // 1. Validate fields
+    if (!senderId || !receiverId) {
       return res.status(400).json({
-        msg: "No image uploaded",
+        msg: "SenderId and ReceiverId are required fields.",
       });
     }
 
+    // 2. Validate file existence
+    if (!req.file) {
+      return res.status(400).json({
+        msg: "No image file provided.",
+      });
+    }
 
+    // 3. Upload file to Cloudinary
+    // Note: If your multer setup uses memoryStorage, use req.file.buffer. 
+    // If it uses diskStorage, use req.file.path.
+    const fileToUpload = req.file.path || req.file.buffer; 
+    
+    const cloudinaryResponse = await cloudinary.uploader.upload(fileToUpload, {
+      folder: "chat_images", // Optional: organizes your images in Cloudinary
+    });
+
+    // 4. Save the Cloudinary secure URL to MongoDB
     const newMessage = await Message.create({
       senderId,
       receiverId,
-      image: req.file.path,
+      image: cloudinaryResponse.secure_url, // Save the actual internet URL!
       message: "",
     });
 
     res.status(200).json({
-      msg: "Image uploaded successfully",
+      msg: "Image uploaded and sent successfully",
       data: newMessage,
     });
+
   } catch (error) {
-    console.log("Upload Error:", error);
+    // Separation by comma ensures Node prints the full error stack trace, not [object Object]
+    console.error("Upload Error Details:", error); 
 
     res.status(500).json({
-      msg: "Server error",
+      msg: "Server error during image upload",
       error: error.message,
     });
   }
