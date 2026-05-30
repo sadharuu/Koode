@@ -123,19 +123,12 @@ const uploadImage = async (req, res) => {
       data: newMessage,
     });
   } catch (error) {
-    // console.log("Upload Error:", error);
+    console.log("Upload Error:", error);
 
-    // res.status(500).json({
-    //   msg: "Server error",
-    //   error: error.message,
-    console.error("Upload error details:", error); 
-  
-    // Alternatively, stringify it if you want to see the JSON structure:
-    // console.log("Upload error JSON:", JSON.stringify(error, null, 2));
-
-      res.status(500).json({ message: "Internal Server Error", details: error.message });
-    
-    // });
+    res.status(500).json({
+      msg: "Server error",
+      error: error.message,
+    });
   }
 };
 
