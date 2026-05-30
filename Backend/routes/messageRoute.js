@@ -1,42 +1,13 @@
 const express = require("express");
-
 const messageRouter = express.Router();
+const upload = require("../middleware/multerMiddleware"); // Adjust this path to your middleware location
+const { uploadImage, sendMessage, showMessage, deleteMessage } = require("../controllers/messageController");
 
-const upload = require("../middlewares/multerMiddleware");
+// The key inside single() MUST match your frontend FormData field key name (e.g., formData.append('image', file))
+messageRouter.post("/uploadimage", upload.single("image"), uploadImage);
 
-const messageController = require("../controllers/messageController");
-
-// ==============================
-// IMAGE MESSAGE UPLOAD
-// ==============================
-messageRouter.post(
-  "/uploadimage",
-  upload.single("image"),
-  messageController.uploadImage
-);
-
-// ==============================
-// TEXT MESSAGE
-// ==============================
-messageRouter.post(
-  "/sendmessage",
-  messageController.sendMessage
-);
-
-// ==============================
-// SHOW CHAT
-// ==============================
-messageRouter.get(
-  "/showmessage/:senderId/:receiverId",
-  messageController.showMessage
-);
-
-// ==============================
-// DELETE MESSAGE
-// ==============================
-messageRouter.delete(
-  "/deletemessage/:id",
-  messageController.deleteMessage
-);
+messageRouter.post("/sendmessage", sendMessage);
+messageRouter.get("/showmessage/:senderId/:receiverId", showMessage);
+messageRouter.delete("/deletemessage/:id", deleteMessage);
 
 module.exports = messageRouter;
